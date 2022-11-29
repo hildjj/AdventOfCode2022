@@ -1,0 +1,39 @@
+{
+  "name": "adventofcode2022",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint . --ext js,ts",
+    "test": "ava",
+    "coverage": "c8 -r lcov ava",
+    "ts": "tsc"
+  },
+  "author": "Joe Hildebrand <joe-github@cursive.net>",
+  "license": "MIT",
+  "dependencies": {
+    "heap-js": "^2.2.0",
+    "nofilter": "^3.1.0",
+    "peggy": "^2.0.1",
+    "ts-node": "^10.9.1"
+  },
+  "devDependencies": {
+    "@peggyjs/eslint-config": "3.0.0",
+    "@types/node": "^18.11.9",
+    "@types/sinon": "^10.0.13",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "ava": "^5.1.0",
+    "c8": "^7.12.0",
+    "eslint": "^8.28.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-tsdoc": "^0.2.17",
+    "execa": "6.1.0",
+    "sinon": "^15.0.0",
+    "typescript": "^4.9.3"
+  },
+  "engines": {
+    "node": ">=17"
+  }
+}
