@@ -12,16 +12,16 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [17]
+        node-version: [19]
         os: [ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: pnpm/action-setup@v2.0.1
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
         with:
-          version: 6.23.1
+          version: 7.17.1
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
@@ -29,9 +29,8 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install
-      # - name: Check coding standards
-      #   if: matrix.node-version == '16.x' && matrix.os == 'ubuntu-latest'
-      #   run: npm run lint
+      - name: Check coding standards
+        run: npm run lint
       - name: Static analysis - check types
         run: npm run ts
       - name: Text with coverage

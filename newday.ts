@@ -28,7 +28,7 @@ async function copyDir(dir: string) {
   }
 }
 
-await execa("open", [`https://adventofcode.com/${YEAR}/day/${day}`])
+await execa("open", [`https://adventofcode.com/${YEAR}/day/${day}`]);
 await copyDir(p.dir);
 await copyDir(`${p.dir}/test`);
 
