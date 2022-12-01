@@ -18,16 +18,19 @@ async function copyDir(dir: string) {
   for (const fn of await readdir(dir)) {
     const m = fn.match(/^day0\.(.*)$/);
     if (m) {
+      const target = `${dir}/day${day}.${m[1]}`;
       try {
-        await execa("cp", ["-n", `${dir}/${fn}`, `${dir}/day${day}.${m[1]}`]);
+        await execa("cp", ["-n", `${dir}/${fn}`, target]);
         console.log(`Created "${rel}/day${day}.${m[1]}"`);
       } catch (e: any) {
         console.log(`Skipping "${rel}/day${day}.${m[1]}"`);
       }
+      await execa("code", [target]);
     }
   }
 }
 
+await execa("git", ["co", "-b", `day${day}`]);
 await execa("open", [`https://adventofcode.com/${YEAR}/day/${day}`]);
 await copyDir(p.dir);
 await copyDir(`${p.dir}/test`);
@@ -38,3 +41,4 @@ await execa("curl", [
   "-o", `inputs/day${day}.txt`,
 ]);
 console.log(`Downloaded "inputs/day${day}.txt"`);
+await execa("code", [`inputs/day${day}.txt`]);
