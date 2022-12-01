@@ -34,6 +34,10 @@ test("forEver", t => {
   ]);
 });
 
+test("once", t => {
+  t.deepEqual(Sequence.once("stop").toArray(), ["stop"]);
+});
+
 test("product", t => {
   t.deepEqual(
     Sequence.product([new Sequence("AB")], 2).map(a => a.join("")).toArray(),
@@ -203,6 +207,16 @@ test("last", t => {
   t.is(new Sequence([1, 2, 3]).last(), 3);
 });
 
+test("histogram", t => {
+  const r = Sequence.range(0, 4).ncycle(5);
+  t.deepEqual(r.histogram(), {
+    0: 5,
+    1: 5,
+    2: 5,
+    3: 5,
+  });
+});
+
 test("ncycle", t => {
   t.deepEqual([...new Sequence("AB").ncycle(0)], []);
   t.deepEqual([...new Sequence("AB").ncycle(1)], ["A", "B"]);
@@ -269,7 +283,7 @@ test("some", t => {
 });
 
 test("startWhen", t => {
-  t.deepEqual([...Sequence.range(10).startWhen(x => x > 8)], [9]);
+  t.deepEqual([...Sequence.range(10).startWhen(x => x > 7)], [8, 9]);
 });
 
 test("take", t => {
@@ -298,15 +312,28 @@ test("windows", t => {
     [...new Sequence("ABCD").windows(2).map(i => i.join(""))],
     ["AB", "BC", "CD"]
   );
+  t.deepEqual(
+    [...new Sequence([]).windows(2)],
+    []
+  );
 });
 
 //#region NumberSequence
 test("avg", t => {
   t.is(Sequence.range(5).avg(), 2);
+  t.is(new NumberSequence([]).avg(), NaN);
 });
 
 test("cumulativeAvg", t => {
   t.deepEqual([...Sequence.range(5).cumulativeAvg()], [0, 0.5, 1, 1.5, 2]);
+  t.deepEqual([...new NumberSequence([]).cumulativeAvg()], []);
+});
+
+test("histogramArray", t => {
+  const n = new NumberSequence([1, 2, 2, 3]);
+  t.deepEqual(n.histogramArray(), [undefined, 1, 2, 1]);
+  const o = new NumberSequence([NaN]);
+  t.throws(() => o.histogramArray());
 });
 
 //
@@ -348,6 +375,19 @@ test("sum", t => {
 
 test("nproduct", t => {
   t.is(new NumberSequence([3, 7, 9]).product(), 189);
+});
+
+test("cumulativeStdev", t => {
+  // Inputs from the output of random(), bucketized.
+  const n = new NumberSequence([
+    99753, 99844, 100312, 99825, 99816,
+    100140, 100256, 99969, 100396, 99689,
+  ]);
+  const c = n.cumulativeStdev().map(n => Math.round(n)).toArray();
+  // I calculated this in google sheets with stdevp().
+  t.deepEqual(c, [0, 46, 245, 221, 203, 204, 218, 204, 231, 242]);
+  const o = new NumberSequence([]);
+  t.deepEqual([...o.cumulativeStdev()], []);
 });
 
 test("stdev", t => {

@@ -203,6 +203,12 @@ export class Sequence<T> {
     });
   }
 
+  /**
+   * A sequence that yields the given value exactly once.
+   *
+   * @param val - The value to yield
+   * @returns A sequence of just val.
+   */
   static once<U>(val: U): Sequence<U> {
     return new Sequence({
       * [Symbol.iterator]() {
@@ -391,8 +397,11 @@ export class Sequence<T> {
     const count = Math.ceil((stop - start) / step);
     return new NumberSequence({
       * [Symbol.iterator]() {
+        /* c8 ignore next */
         if (stop === undefined) {
+          /* c8 ignore next */
           throw new TypeError("impossible");
+          /* c8 ignore next */
         }
         if (step < 0) {
           for (let i = start; i > stop; i += step) {
@@ -908,6 +917,12 @@ export class Sequence<T> {
     return prev;
   }
 
+  /**
+   * Generate a histogram object of all of the items in the sequence.  They
+   * keys will be the stringified versions of the item.
+   *
+   * @returns Object with counts of each item.
+   */
   histogram(): { [id: string]: number } {
     const counts = new Counter();
     for (const i of this.it) {
@@ -1422,12 +1437,12 @@ export class NumberSequence extends Sequence<number> {
    * @returns The average of the numbers in the sequence
    */
   avg(): number {
-    let max = -1;
+    let max = -Infinity;
     const tot = this.reduce((t, v, i) => {
       max = i;
       return t + v;
     }, 0);
-    if (max === -1) {
+    if (max === -Infinity) {
       return NaN;
     }
     return tot / (max + 1);
@@ -1462,22 +1477,48 @@ export class NumberSequence extends Sequence<number> {
     });
   }
 
-  histogramArray(): NumberSequence {
-    return new NumberSequence(this.reduce<number[]>((t, v) => {
+  /**
+   * Specialize histogram() to return a sequence instead of an object.
+   * The sequence should be all integers greater or equal to 0.
+   *
+   * @returns Sequence of counts
+   */
+  histogramArray(): number[] {
+    const res: number[] = [];
+    for (const v of this.it) {
       const x = Math.floor(v);
-      t[x] = (t[x] ?? 0) + 1;
-      return t;
-    }, []));
+      if ((x !== v) || (x < 0)) {
+        throw new Error("Invalid input stream, must be non-negative integers");
+      }
+      res[x] = (res[x] ?? 0) + 1;
+    }
+    return res;
   }
 
+  /**
+   * Sum up all of the items in the sequence.
+   *
+   * @returns Sum
+   */
   sum(): number {
     return this.reduce((t, v) => t + v);
   }
 
+  /**
+   * Multiply all of the items of the sequence together.
+   *
+   * @returns Product of items.
+   */
   product(): number {
     return this.reduce((t, v) => t * v);
   }
 
+  /**
+   * Generate a sequence with an item for each item in the input series, whose
+   * values are the standard deviation up to that point in the input series.
+   *
+   * @returns Sequence of stddevp deviations.
+   */
   cumulativeStdev(): NumberSequence {
     // See:
     // https://en.wikipedia.org/wiki/Standard_deviation#Rapid_calculation_methods
@@ -1504,6 +1545,11 @@ export class NumberSequence extends Sequence<number> {
     });
   }
 
+  /**
+   * Standard deviation of a whole series.
+   *
+   * @returns - stddevp
+   */
   stdev(): number {
     let count = 0;
     let cma = 0;
@@ -1517,7 +1563,12 @@ export class NumberSequence extends Sequence<number> {
     return Math.sqrt(Q / count);
   }
 
-  // This comes up enough that it's worth optimizing.
+  /**
+   * Take the first n, optimizied for NumberSequence.
+   *
+   * @param n - The number of sequence items to take
+   * @returns Sequence of up to n items
+   */
   take(n: number): NumberSequence {
     return new NumberSequence(super.take(n).it, n);
   }
