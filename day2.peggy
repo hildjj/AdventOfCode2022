@@ -3,11 +3,11 @@ list = game+
 game = @ABC " " @XYZ "\n"
 
 ABC
-  = "A" { return 1 }
-  / "B" { return 2 }
-  / "C" { return 3 }
+  = "A" { return 0 }
+  / "B" { return 1 }
+  / "C" { return 2 }
 
 XYZ
-  = "X" { return 1 }
-  / "Y" { return 2 }
-  / "Z" { return 3 }
+  = "X" { return 0 }
+  / "Y" { return 1 }
+  / "Z" { return 2 }

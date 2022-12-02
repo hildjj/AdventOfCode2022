@@ -33,7 +33,7 @@ jobs:
         run: npm run lint
       - name: Static analysis - check types
         run: npm run ts
-      - name: Text with coverage
+      - name: Test with coverage
         run: npm run coverage
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
