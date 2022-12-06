@@ -3,15 +3,10 @@ import Utils from "./utils.js"; // Really .ts
 
 function findMarker(inp: string[], len: number): number {
   // The first len chars will dup with the first character.
-  const q = Array.from(new Array(len), () => inp[0]);
-  let count = 1;
-  for (const c of inp) {
-    q.shift();
-    q.push(c);
-    if (new Set(q).size === len) {
-      return count;
+  for (let first = 0, last = len; last < inp.length; first++, last++) {
+    if (new Set(inp.slice(first, last)).size === len) {
+      return last;
     }
-    count++;
   }
   return NaN;
 }
