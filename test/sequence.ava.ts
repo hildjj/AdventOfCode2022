@@ -137,9 +137,9 @@ test("discard", t => {
   t.deepEqual(Sequence.range(5).discard(3).toArray(), [3, 4]);
 });
 
-test("entries", t => {
+test("indexed", t => {
   const s = new Sequence("abc");
-  t.deepEqual([...s.entries()], [[0, "a"], [1, "b"], [2, "c"]]);
+  t.deepEqual([...s.indexed()], [[0, "a"], [1, "b"], [2, "c"]]);
 });
 
 test("every", t => {
@@ -178,6 +178,25 @@ test("flat", t => {
 test("flatMap", t => {
   const s = new Sequence([1, [2, 3]]);
   t.deepEqual([...s.flatMap(x => Array.isArray(x) ? x : -x)], [-1, 2, 3]);
+});
+
+test("forEach", t => {
+  const res: number[][] = [];
+  const seq = Sequence.range(1, 5);
+  const that = Symbol("that");
+  seq.forEach(function(item, index, s) {
+    t.is(seq, s as NumberSequence);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore this is an alias
+    t.is(this as unknown, that);
+    res.push([item, index]);
+  }, that);
+  t.deepEqual(res, [
+    [1, 0],
+    [2, 1],
+    [3, 2],
+    [4, 3],
+  ]);
 });
 
 test("groupBy", t => {
