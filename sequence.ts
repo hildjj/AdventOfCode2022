@@ -74,6 +74,14 @@ type reduceCallback<T, A>
   = (accumulator: A, item: T, index: number, sequence: Sequence<T>) => A;
 
 /**
+  * @param item - The item of the iterator to process
+  * @param index - The index of the item in the iterator
+  * @param sequence - The sequence being iterated
+ */
+type forEachCallback<T>
+  = (item: T, index: number, sequence: Sequence<T>) => void;
+
+/**
  * Lazy sequences, based on generators and iterators.
  *
  * The more interesting functions were lifted from lifted from
@@ -662,7 +670,7 @@ export class Sequence<T> {
    *
    * @returns Sequence of [number, item] tuples
    */
-  entries(): Sequence<[number, T]> {
+  indexed(): Sequence<[number, T]> {
     const that = this;
     return new Sequence({
       * [Symbol.iterator]() {
@@ -689,6 +697,19 @@ export class Sequence<T> {
       }
     }
     return true;
+  }
+
+  /**
+   * Call a function for every item in the sequence.
+   *
+   * @param fn - The function
+   * @param thisArg - Optional argument to be `this` in the function.
+   */
+  forEach(fn: forEachCallback<T>, thisArg?: any): void {
+    let count = 0;
+    for (const i of this.it) {
+      fn.call(thisArg, i, count++, this);
+    }
   }
 
   /**
