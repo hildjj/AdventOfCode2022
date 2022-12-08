@@ -4,16 +4,7 @@ import Utils from "./utils.js"; // Really .ts
 function part1(inp: number[][]): number {
   const height = inp.length;
   const width = inp[0].length;
-  const visible: number[][] = inp.map((row, i) => row.map(
-    (_, j) => (
-      (i === 0)             // Top edge
-      || (j === 0)          // Left edge
-      || (i === height - 1) // Bottom edge
-      || (j === width - 1)  // Right edge
-    )
-      ? 1
-      : 0
-  ));
+  const visible: number[][] = inp.map(row => row.map(() => 0));
 
   for (let i = 1; i < height - 1; i++) {
     // LtoR
@@ -26,7 +17,7 @@ function part1(inp: number[][]): number {
     }
     // RtoL
     max = -Infinity;
-    for (let j = width - 1; j > 0; j--) {
+    for (let j = width - 1; j >= 0; j--) {
       if (inp[i][j] > max) {
         max = inp[i][j];
         visible[i][j] = 1;
@@ -35,9 +26,9 @@ function part1(inp: number[][]): number {
   }
 
   // TtoB
-  for (let j = 1; j < width - 1; j++) {
+  for (let j = 0; j < width; j++) {
     let max = -Infinity;
-    for (let i = 0; i < height - 1; i++) {
+    for (let i = 0; i < height; i++) {
       if (inp[i][j] > max) {
         max = inp[i][j];
         visible[i][j] = 1;
@@ -46,7 +37,7 @@ function part1(inp: number[][]): number {
 
     // BtoT
     max = -Infinity;
-    for (let i = height - 1; i > 0; i--) {
+    for (let i = height - 1; i >= 0; i--) {
       if (inp[i][j] > max) {
         max = inp[i][j];
         visible[i][j] = 1;
