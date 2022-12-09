@@ -41,5 +41,5 @@ jobs:
           files: coverage/lcov.info
           env_vars: OS,NODE
           name: codecov-umbrella
-          fail_ci_if_error: true
+          fail_ci_if_error: false
           verbose: true
