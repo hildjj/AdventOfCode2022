@@ -1,20 +1,21 @@
 #!/usr/bin/env node --loader ts-node/esm
 import Utils from "./utils.js"; // Really .ts
 
-const DIR = {
-  U: [0, -1],
-  D: [0, 1],
-  L: [-1, 0],
-  R: [1, 0],
-};
-
-type Direction = keyof typeof DIR;
-type Move = [Direction, number];
 interface Pos {
   x: number;
   y: number;
 }
 type PosSet = Set<string>;
+
+const DELTAS: Record<string, Pos> = {
+  U: { x: 0,  y: -1 },
+  D: { x: 0,  y: 1 },
+  L: { x: -1, y: 0 },
+  R: { x: 1,  y: 0 },
+};
+
+type Direction = keyof typeof DELTAS;
+type Move = [Direction, number];
 
 function posToString(p: Pos): string {
   return `${p.x},${p.y}`;
@@ -46,10 +47,10 @@ function moveSnake(inp: Move[], LEN: number): number {
   const tailPos: PosSet = new Set();
 
   for (const [dir, len] of inp) {
-    const d = DIR[dir];
+    const delta = DELTAS[dir];
     for (let i = 0; i < len; i++) {
-      snake[0].x += d[0];
-      snake[0].y += d[1];
+      snake[0].x += delta.x;
+      snake[0].y += delta.y;
 
       for (let j = 1; j < LEN; j++) {
         moveTail(snake[j - 1], snake[j]);
