@@ -25,20 +25,9 @@ function moveTail(head: Pos, tail: Pos) {
   const xdiff = head.x - tail.x;
   const ydiff = head.y - tail.y;
 
-  if (!xdiff) {
-    if (Math.abs(ydiff) > 1) {
-      tail.y += Math.sign(ydiff);
-    }
-  } else if (!ydiff) {
-    if (Math.abs(xdiff) > 1) {
-      tail.x += Math.sign(xdiff);
-    }
-  } else {
-    // Must be diagonal since both xdiff and ydiff
-    if ((Math.abs(xdiff) !== 1) || (Math.abs(ydiff) !== 1)) {
-      tail.x += Math.sign(xdiff);
-      tail.y += Math.sign(ydiff);
-    }
+  if ((Math.abs(xdiff) > 1) || (Math.abs(ydiff) > 1)) {
+    tail.x += Math.sign(xdiff);
+    tail.y += Math.sign(ydiff);
   }
 }
 
