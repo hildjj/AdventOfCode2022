@@ -213,4 +213,8 @@ export default class Utils {
     /* c8 ignore next */
     throw new Error("Unreachable");
   }
+
+  static deepCopy<T>(nest: T): T {
+    return JSON.parse(JSON.stringify(nest)) as T;
+  }
 }
