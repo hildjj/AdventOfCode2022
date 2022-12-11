@@ -7,12 +7,8 @@ interface Plan {
   moves: number[][];
 }
 
-function deepCopy<T>(nest: T): T {
-  return JSON.parse(JSON.stringify(nest)) as T;
-}
-
 function part1(inp: Plan): string {
-  const stacks = deepCopy(inp.stacks);
+  const stacks = Utils.deepCopy(inp.stacks);
   for (const [size, from, to] of inp.moves) {
     const crates = stacks[from - 1].splice(0, size);
     crates.reverse();
@@ -22,7 +18,7 @@ function part1(inp: Plan): string {
 }
 
 function part2(inp: Plan): string {
-  const stacks = deepCopy(inp.stacks);
+  const stacks = Utils.deepCopy(inp.stacks);
   for (const [size, from, to] of inp.moves) {
     const crates = stacks[from - 1].splice(0, size);
     stacks[to - 1].splice(0, 0, ...crates);
