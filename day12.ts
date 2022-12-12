@@ -1,76 +1,99 @@
 #!/usr/bin/env node --loader ts-node/esm
 import Utils from "./utils.js"; // Really .ts
 
-function findAll(char: number, field: number[][]): [number, number][] {
-  const res: [number, number][] = [];
+interface Cell {
+  x: number,
+  y: number,
+  value: number,
+  visited: boolean;
+  distance: number;
+}
+
+const cells: Record<string, Cell> = {};
+
+function getCell(inp: number[][], x: number, y: number): Cell {
+  const xy = `${x},${y}`;
+  let c = cells[xy];
+  if (!c) {
+    c = {
+      x,
+      y,
+      value: inp[y][x],
+      visited: false,
+      distance: Infinity,
+    };
+    cells[xy] = c;
+  }
+  return c;
+}
+
+function findAll(char: number, field: number[][]): Cell[] {
+  const res: Cell[] = [];
   for (const [i, s] of field.entries()) {
     for (const [j, c] of s.entries()) {
       if (c === char) {
-        res.push([j, i]);
+        res.push(getCell(field, j, i));
       }
     }
   }
   return res;
 }
 
-function route(
-  inp: number[][],
-  pos: [number, number],
-  end: [number, number],
-  cur: number,
-  distance: number,
-  visited: Record<string, number>
-): number {
-  // Edges
-  if ((pos[0] === end[0]) && (pos[1] === end[1])) {
-    return distance;
+function neighbors(inp: number[][], cell: Cell): Cell[] {
+  const ret: Cell[] = [];
+  if (cell.x > 0) {
+    ret.push(getCell(inp, cell.x - 1, cell.y));
   }
-  if (pos[0] < 0 || pos[1] < 0) {
-    return Infinity;
+  if (cell.y > 0) {
+    ret.push(getCell(inp, cell.x, cell.y - 1));
   }
-  if ((pos[1] >= inp.length) || (pos[0] >= inp[pos[1]].length)) {
-    return Infinity;
+  if (cell.x < inp[cell.y].length - 1) {
+    ret.push(getCell(inp, cell.x + 1, cell.y));
   }
-  // Too tall
-  const n = inp[pos[1]][pos[0]];
-  if (n > cur + 1) {
-    return Infinity;
+  if (cell.y < inp.length - 1) {
+    ret.push(getCell(inp, cell.x, cell.y + 1));
   }
+  return ret.filter(c => cell.value <= (c.value + 1));
+}
 
-  // Been there quicker
-  const ps = pos.toString();
-  const prev = visited[ps];
-  if (prev && (distance >= prev)) {
-    return Infinity;
+function flood(inp: number[][], cell: Cell) {
+  if (cell.visited) {
+    return;
   }
-  visited[ps] = distance;
-
-  return Math.min(
-    route(inp, [pos[0] + 1, pos[1]], end, n, distance + 1, visited),
-    route(inp, [pos[0] - 1, pos[1]], end, n, distance + 1, visited),
-    route(inp, [pos[0], pos[1] + 1], end, n, distance + 1, visited),
-    route(inp, [pos[0], pos[1] - 1], end, n, distance + 1, visited)
-  );
+  cell.visited = true;
+  const dist = cell.distance + 1;
+  const bors = neighbors(inp, cell);
+  for (const n of bors) {
+    if (dist < n.distance) {
+      n.distance = dist;
+      if (n.visited) {
+        n.visited = false;
+      }
+    }
+  }
+  for (const n of bors) {
+    flood(inp, n);
+  }
 }
 
 function part1(inp: number[][]): number {
-  const start = findAll(-1, inp)[0];
-  const end = findAll(Infinity, inp)[0];
-  return route(inp, start, end, 0, 0, {});
+  const sc = findAll(-1, inp)[0];
+  return sc.distance;
 }
 
 function part2(inp: number[][]): number {
   const starts = findAll(0, inp);
   starts.push(findAll(-1, inp)[0]); // Also try S.
-  const end = findAll(Infinity, inp)[0];
-  // Share this between runs.  If you can't get to this pos quicker, your
-  // starting point isn't better.
-  const visited = {};
-  return Math.min(...starts.map(s => route(inp, s, end, 0, 0, visited)));
+  return Math.min(...starts.map(s => s.distance));
 }
 
 export default function main(inFile: string, trace: boolean) {
   const inp: number[][] = Utils.parseFile(inFile, undefined, trace);
+  const ec = findAll(Infinity, inp)[0];
+  ec.distance = 0;
+  ec.value = 25;
+  flood(inp, ec);
+
   return [part1(inp), part2(inp)];
 }
 
