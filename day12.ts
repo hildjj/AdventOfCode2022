@@ -1,11 +1,11 @@
 #!/usr/bin/env node --loader ts-node/esm
+import { Heap } from "heap-js";
 import Utils from "./utils.js"; // Really .ts
 
 interface Cell {
-  x: number,
-  y: number,
-  value: number,
-  visited: boolean;
+  x: number;
+  y: number;
+  value: number;
   distance: number;
 }
 
@@ -15,13 +15,7 @@ function getCell(inp: number[][], x: number, y: number): Cell {
   const xy = `${x},${y}`;
   let c = cells[xy];
   if (!c) {
-    c = {
-      x,
-      y,
-      value: inp[y][x],
-      visited: false,
-      distance: Infinity,
-    };
+    c = { x, y, value: inp[y][x], distance: Infinity };
     cells[xy] = c;
   }
   return c;
@@ -57,22 +51,19 @@ function neighbors(inp: number[][], cell: Cell): Cell[] {
 }
 
 function flood(inp: number[][], cell: Cell) {
-  if (cell.visited) {
-    return;
-  }
-  cell.visited = true;
-  const dist = cell.distance + 1;
-  const bors = neighbors(inp, cell);
-  for (const n of bors) {
-    if (dist < n.distance) {
-      n.distance = dist;
-      if (n.visited) {
-        n.visited = false;
+  // A*, more or less
+  const pq = new Heap<Cell>((a, b) => a.distance - b.distance);
+  pq.add(cell); // Starting point
+  for (const cell of pq) {
+    const dist = cell.distance + 1;
+    for (const n of neighbors(inp, cell)) {
+      if (dist < n.distance) {
+        // Since we're visiting the shortest paths first, n is never already
+        // visited.
+        n.distance = dist;
+        pq.push(n);
       }
     }
-  }
-  for (const n of bors) {
-    flood(inp, n);
   }
 }
 
@@ -92,6 +83,7 @@ export default function main(inFile: string, trace: boolean) {
   const ec = findAll(Infinity, inp)[0];
   ec.distance = 0;
   ec.value = 25;
+  // Find the shortest distance to the end for each cell that can reach the end.
   flood(inp, ec);
 
   return [part1(inp), part2(inp)];
