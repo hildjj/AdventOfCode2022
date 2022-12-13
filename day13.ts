@@ -11,57 +11,57 @@ enum Order {
   Bad = 1
 }
 
+function isNumber(n: any): n is number {
+  return typeof n === "number" && !Number.isNaN(n);
+}
+
 function compare(left: List|number, right: List|number): Order {
-  if (typeof left === "number") {
-    if (typeof right === "number") {
+  if (isNumber(left)) {
+    if (isNumber(right)) {
       if (left < right) {
         return Order.Good;
       } else if (right < left) {
         return Order.Bad;
       }
       return Order.Indifferent;
-    } else {
-      return compare([left], right);
     }
+    return compare([left], right);
   } else {
-    if (typeof right === "number") {
+    if (isNumber(right)) {
       return compare(left, [right]);
-    } else {
-      for (let i = 0; i < left.length; i++) {
-        // If the right list runs out of items first, the inputs are not in
-        // the right order.
-        if (i >= right.length) {
-          return Order.Bad;
-        }
-        const comp = compare(left[i], right[i]);
-        if (comp !== Order.Indifferent) {
-          return comp;
-        }
-      }
-      // If the left list runs out of items first, the inputs are in the right
-      // order.
-      return (left.length === right.length) ? Order.Indifferent : Order.Good;
     }
+    for (let i = 0; i < left.length; i++) {
+      // If the right list runs out of items first, the inputs are not in
+      // the right order.
+      if (i >= right.length) {
+        return Order.Bad;
+      }
+      const comp = compare(left[i], right[i]);
+      if (comp !== Order.Indifferent) {
+        return comp;
+      }
+    }
+    // If the left list runs out of items first, the inputs are in the right
+    // order.
+    return (left.length < right.length) ? Order.Good : Order.Indifferent;
   }
 }
 
 function part1(inp: Pair[]): number {
-  let total = 0;
-  for (const [i, [left, right]] of inp.entries()) {
-    if (compare(left, right) === Order.Good) {
-      total += i + 1;
-    }
-  }
-  return total;
+  return inp.reduce(
+    (t, [left, right], i) => t
+      + ((compare(left, right) === Order.Good) ? i + 1 : 0),
+    0
+  );
 }
 
 function part2(inp: Pair[]): number {
   const all = inp.flat(1);
   const two: List = [[2]];
   const six: List = [[6]];
-  all.push(two);
-  all.push(six);
-  all.sort((a, b) => compare(a, b));
+  all.push(two, six);
+  all.sort(compare);
+  // Note: pointer equality
   return (all.findIndex(x => x === two) + 1)
     * (all.findIndex(x => x === six) + 1);
 }
