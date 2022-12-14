@@ -4,12 +4,15 @@ import Utils from "./utils.js"; // Really .ts
 type Point = { x: number, y: number };
 type Line = Point[]
 
-const xy = (x: number, y:number) => `${x},${y}`;
+function xy(x: number, y:number): number {
+  // No negatives or large numbers in the input.
+  return (x << 16) | y;
+}
 
-function rasterize(lines: Line[]): [Set<string>, number] {
-  const points = new Set<string>();
+function rasterize(lines: Line[]): [Set<number>, number] {
+  const points = new Set<number>();
   let maxy = -Infinity;
-  // Rasterize
+
   for (const line of lines) {
     let prev: Point | null = null;
     for (const point of line) {
