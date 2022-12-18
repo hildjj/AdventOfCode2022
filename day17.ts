@@ -29,17 +29,6 @@ export const shapes: Shape[] = [
   ], 2],
 ];
 
-export function print(chamber: number[], on = "#") {
-  for (let i = chamber.length - 1; i >= 0; i--) {
-    let line = "";
-    for (let k = 6; k >= 0; k--) {
-      line += (chamber[i] & (1 << k)) ? on : ".";
-    }
-    console.log(line);
-  }
-  console.log("-------\n");
-}
-
 export function shift(shape: Shape, pos: number): number[] {
   return shape[0].map(s => s << (7 - pos - shape[1]));
 }
