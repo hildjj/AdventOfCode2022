@@ -41,6 +41,7 @@ async function copyDir(dir: string) {
 }
 
 const d = new Date();
+d.setDate(parseInt(day, 10));
 d.setUTCHours(5);
 d.setMinutes(0);
 d.setSeconds(0);
