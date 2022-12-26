@@ -1,5 +1,5 @@
 export default {
-  timeout: "20s",
+  timeout: "20m",
   files: [
     "test/*.ava.ts",
   ],
