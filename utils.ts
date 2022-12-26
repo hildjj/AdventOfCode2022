@@ -214,6 +214,31 @@ export default class Utils {
     throw new Error("Unreachable");
   }
 
+  static gcd<T extends number | bigint>(...n: T[]): T {
+    switch (n.length) {
+      case 0: throw new Error("Invalid input");
+      case 1: return n[0];
+      case 2: {
+        let [a, b] = n;
+        while (b !== 0) {
+          [a, b] = [b, Utils.mod(a, b)];
+        }
+        return a;
+      }
+      default:
+        return n.reduce((t, v) => Utils.gcd(t, v));
+    }
+  }
+
+  static lcm<T extends number | bigint>(...n: T[]): T {
+    // TS isn't quite smart enough about generic maths,
+    // so there are more `as T` here than I want.
+    return n.reduce<T>(
+      (t, v) => (((t * v) as T) / Utils.gcd(t, v)) as T,
+      ((typeof n[0] === "number") ? 1 : 1n) as T
+    );
+  }
+
   static deepCopy<T>(nest: T): T {
     return JSON.parse(JSON.stringify(nest)) as T;
   }
